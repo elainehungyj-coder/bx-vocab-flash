@@ -3365,8 +3365,20 @@ function showQuiz() {
   resultDiv.style.display = 'none';
   resultDiv.textContent = '';
   resultDiv.style.border = 'none';
-  var wrong = entries.filter(function(x) { return x.id !== e.id; }).slice().sort(function() { return Math.random() - 0.5; }).slice(0, 3);
-  var options = wrong.concat([e]).slice().sort(function() { return Math.random() - 0.5; });
+  var correctMeaning = (e.meaning || '').trim();
+  var wrong = entries.filter(function(x) {
+    if (x.id === e.id) return false;
+    var m = (x.meaning || '').trim();
+    return m && m !== correctMeaning;
+  });
+  var seen = {};
+  var unique = [];
+  for (var i = 0; i < wrong.length; i++) {
+    var m = wrong[i].meaning.trim();
+    if (!seen[m]) { seen[m] = true; unique.push(wrong[i]); }
+  }
+  var shuffled = unique.sort(function() { return Math.random() - 0.5; }).slice(0, 3);
+  var options = shuffled.concat([e]).sort(function() { return Math.random() - 0.5; });
   currentQuiz = { correctId: e.id };
   var optsDiv = document.getElementById('quizOptions');
   var html = '';
