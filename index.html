@@ -3384,49 +3384,36 @@ function answerQuiz(id) {
   if (!currentQuiz) return;
   var correct = id === currentQuiz.correctId;
   var resultDiv = document.getElementById('quizResult');
-  var selectedBtn = null;
-  var correctBtn = null;
-  document.querySelectorAll('.quiz-option').forEach(function(btn) {
+  var btns = document.querySelectorAll('.quiz-option');
+  for (var i = 0; i < btns.length; i++) {
+    var btn = btns[i];
     btn.disabled = true;
-    btn.style.pointerEvents = 'none';
-    if (btn.dataset.id === currentQuiz.correctId) {
-      btn.style.borderColor = '#4a9d6f';
-      btn.style.background = '#e6f4ec';
-      btn.style.color = '#2d7a4a';
-      btn.style.fontWeight = '600';
-      correctBtn = btn;
-    } else if (btn.dataset.id === id && !correct) {
-      btn.style.borderColor = '#b54a4a';
-      btn.style.background = '#fbeaea';
-      btn.style.color = '#b54a4a';
-      selectedBtn = btn;
+    var isCorrect = btn.dataset.id === currentQuiz.correctId;
+    var isSelected = btn.dataset.id === id;
+    if (isCorrect) {
+      btn.style.cssText = 'border-color:#4a9d6f;background:#e6f4ec;color:#2d7a4a;font-weight:600;display:block;width:100%;text-align:left;padding:14px 16px;border-radius:10px;font-size:15px;margin-bottom:10px;font-family:inherit;cursor:default;';
+      btn.innerHTML = '✅ ' + btn.innerHTML;
+    } else if (isSelected && !correct) {
+      btn.style.cssText = 'border-color:#b54a4a;background:#fbeaea;color:#b54a4a;display:block;width:100%;text-align:left;padding:14px 16px;border-radius:10px;font-size:15px;margin-bottom:10px;font-family:inherit;cursor:default;';
+      btn.innerHTML = '❌ ' + btn.innerHTML;
     } else {
-      btn.style.opacity = '0.5';
+      btn.style.opacity = '0.4';
     }
-  });
+  }
   var entry = entries.find(function(x) { return x.id === currentQuiz.correctId; });
   if (entry) {
     entry.reviewCount = (entry.reviewCount || 0) + 1;
     entry.lastReviewed = Date.now();
     if (correct) {
       if (entry.reviewCount >= 3) entry.status = 'mastered'; else entry.status = 'learning';
-      resultDiv.textContent = '✅ 正确！';
-      resultDiv.style.display = 'block';
-      resultDiv.style.background = '#e6f4ec';
-      resultDiv.style.color = '#2d7a4a';
-      resultDiv.style.border = '2px solid #4a9d6f';
-      if (correctBtn) correctBtn.textContent = '✅ ' + correctBtn.textContent;
+      resultDiv.innerHTML = '✅ 正确！';
+      resultDiv.style.cssText = 'display:block;text-align:center;padding:14px;margin:10px 0;border-radius:10px;font-size:18px;font-weight:600;background:#e6f4ec;color:#2d7a4a;border:2px solid #4a9d6f;';
     } else {
       entry.status = 'learning';
-      resultDiv.textContent = '❌ 不对，正确答案是：' + (entry.meaning || '').trim();
-      resultDiv.style.display = 'block';
-      resultDiv.style.background = '#fbeaea';
-      resultDiv.style.color = '#b54a4a';
-      resultDiv.style.border = '2px solid #b54a4a';
-      if (selectedBtn) selectedBtn.textContent = '❌ ' + selectedBtn.textContent;
-      if (correctBtn) correctBtn.textContent = '✅ ' + correctBtn.textContent;
+      resultDiv.innerHTML = '❌ 不对，正确答案是：<b>' + escapeHtml((entry.meaning || '').trim()) + '</b>';
+      resultDiv.style.cssText = 'display:block;text-align:center;padding:14px;margin:10px 0;border-radius:10px;font-size:18px;font-weight:600;background:#fbeaea;color:#b54a4a;border:2px solid #b54a4a;';
     }
-    saveData();
+    saveData(false);
   }
   document.getElementById('quizNextBtn').disabled = false;
 }
