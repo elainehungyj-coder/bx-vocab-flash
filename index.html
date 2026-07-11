@@ -3050,8 +3050,7 @@ function loadData() {
 
 function saveData(show) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  renderAll();
-  if (show !== false) showToast('已储存');
+  if (show !== false) { renderAll(); showToast('已储存'); }
 }
 
 function genId() {
