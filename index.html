@@ -3057,17 +3057,26 @@ function loadData() {
     var raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       var parsed = JSON.parse(raw);
-      // If localStorage has empty array, reload from DEFAULT_ENTRIES
       if (Array.isArray(parsed) && parsed.length === 0) {
         entries = DEFAULT_ENTRIES.slice();
-        saveData(false);
       } else {
         entries = parsed;
+        // Merge any new DEFAULT_ENTRIES not yet in localStorage
+        var existingIds = {};
+        for (var i = 0; i < entries.length; i++) existingIds[entries[i].id] = true;
+        var added = 0;
+        for (var i = 0; i < DEFAULT_ENTRIES.length; i++) {
+          if (!existingIds[DEFAULT_ENTRIES[i].id]) {
+            entries.push(DEFAULT_ENTRIES[i]);
+            added++;
+          }
+        }
+        if (added > 0) showToast('已导入 ' + added + ' 个新词汇');
       }
     } else {
       entries = DEFAULT_ENTRIES.slice();
-      saveData(false);
     }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   } catch (e) { 
     entries = DEFAULT_ENTRIES.slice(); 
   }
